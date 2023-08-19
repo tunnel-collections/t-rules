@@ -1,0 +1,236 @@
+mixed-port: 7788
+redir-port: 1234
+allow-lan: true
+mode: rule
+log-level: info
+
+# web ui 访问地址
+external-controller: "0.0.0.0:2345"
+secret: "10086"
+
+sniffer:
+  enable: false
+  sniffing:
+    - tls
+    - http
+  skip-domain:
+    - "Mijia Cloud"
+    - "dlg.io.mi.com"
+    - "+.apple.com"
+    - "*.baidu.com"
+  force-domain:
+    - "google.com"
+    - "youtube.com"
+    - "stackoverflow.com"
+  port-whitelist:
+    - 80
+    - 443
+    - 8000-9000
+
+dns:
+  enable: true
+  ipv6: false
+  listen: 0.0.0.0:5334
+  # enhanced-mode: redir-host
+  enhanced-mode: fake-ip
+  fake-ip-filter:
+    - "*.lan"
+    - "daemon.warn"
+    - "*.DHCP"
+    - stun.*.*.*
+    - stun.*.*
+    - time.windows.com
+    - "*.ntp.org.cn"
+    - pool.ntp.org
+    - localhost.ptlogin2.qq.com
+    - "*.dogenode.xyz"
+  default-nameserver:
+    - 119.29.29.29
+    - 114.114.114.114
+  # dns 上游，可以自建 dnsmasq 或者 smartdns
+  nameserver:
+    - https://doh.pub/dns-query
+    - tls://223.5.5.5:853
+  fallback:
+    - "https://1.0.0.1/dns-query#代理" # 使用代理处理 DNS
+    - "tls://8.8.4.4:853#代理"
+  fallback-filter:
+    geoip: false
+    geosite:
+      - gfw
+    ipcidr:
+      - 240.0.0.0/4
+      - 0.0.0.0/32
+      - 127.0.0.1/32
+    domain:
+      - +.google.com
+      - +.facebook.com
+      - +.twitter.com
+      - +.youtube.com
+      - +.xn--ngstr-lra8j.com
+      - +.google.cn
+      - +.googleapis.cn
+      - +.googleapis.com
+      - +.gvt1.com
+
+tun:
+  enable: true
+  stack: system # gvisor / lwip
+  dns-hijack:
+    - any:53 # 需要劫持的 DNS
+  auto-detect-interface: true # 自动识别出口网卡
+  auto-route: true # 配置路由表
+  # mtu: 9000 # 最大传输单元
+  strict-route: true # 将所有连接路由到tun来防止泄漏，但你的设备将无法其他设备被访问
+  inet4-route-address: # 启用 auto_route 时使用自定义路由而不是默认路由
+    - 0.0.0.0/1
+    - 128.0.0.0/1
+
+######### 锚点 start #######
+#这里是订阅更新和延迟测试相关的
+p: &p {type: http, interval: 3600, health-check: {enable: true, url: http://cp.cloudflare.com, interval: 300}}
+
+SELECT_FILTER: &SELECT_FILTER
+  type: select
+  use:
+    - provider1
+    - provider2
+
+ULT_FILTER: &ULT_FILTER
+  type: url-test
+  use:
+    - provider1
+    - provider2
+
+FB_FILTER: &FB_FILTER
+  type: fallback
+  use:
+    - provider1
+    - provider2
+
+######### 锚点 end #######
+
+proxy-providers:
+  provider1:
+    # 机场订阅地址
+    url: https://1
+    <<: *p
+
+  provider2:
+    # 机场订阅地址
+    url: 'https://2'
+    <<: *p
+
+proxy-groups:
+  # 台湾
+  - { name: 台湾, <<: *SELECT_FILTER, filter: "(?i)台湾|台北|tw|taiwan" }
+  - { name: 台湾-FB, <<: *FB_FILTER, filter: "(?i)台湾|台北|tw|taiwan" }
+  - { name: 台湾-ULT, <<: *ULT_FILTER, filter: "(?i)台湾|台北|tw|taiwan" }
+
+  # 新加坡
+  - { name: 新加坡, <<: *SELECT_FILTER, filter: "(?i)新加坡|广新|sg|singapore" }
+  - { name: 新加坡-FB, <<: *FB_FILTER, filter: "(?i)新加坡|广新|sg|singapore" }
+  - { name: 新加坡-ULT, <<: *ULT_FILTER, filter: "(?i)新加坡|广新|sg|singapore" }
+
+  # 香港
+  - { name: 香港, <<: *SELECT_FILTER, filter: "(?i)港|hk|hongkong|hong kong" }
+  - { name: 香港-FB, <<: *FB_FILTER, filter: "(?i)港|hk|hongkong|hong kong" }
+  - { name: 香港-ULT, <<: *ULT_FILTER, filter: "(?i)港|hk|hongkong|hong kong" }
+
+  # 美国
+  - { name: 美国, <<: *SELECT_FILTER, filter: "(?i)美国|广美|us|usa|united states" }
+  - { name: 美国-FB, <<: *FB_FILTER, filter: "(?i)美国|广美|us|usa|united states" }
+  - { name: 美国-ULT, <<: *ULT_FILTER, filter: "(?i)美国|广美|us|usa|united states" }
+
+  # 日本
+  - { name: 日本, <<: *SELECT_FILTER, filter: "(?i)日本|广日|jp|japan" }
+  - { name: 日本-FB, <<: *FB_FILTER, filter: "(?i)日本|广日|jp|japan" }
+  - { name: 日本-ULT, <<: *ULT_FILTER, filter: "(?i)日本|广日|jp|japan" }
+
+  # 韩国
+  - { name: 韩国, <<: *SELECT_FILTER, filter: "(?i)韩国|广韩|kr|korea" }
+  - { name: 韩国-FB, <<: *FB_FILTER, filter: "(?i)韩国|广韩|kr|korea" }
+  - { name: 韩国-ULT, <<: *ULT_FILTER, filter: "(?i)韩国|广韩|kr|korea" }
+
+  # 土耳其
+  - { name: 土耳其, <<: *SELECT_FILTER, filter: "(?i)土耳其|tr|turkey" }
+  - { name: 土耳其-FB, <<: *FB_FILTER, filter: "(?i)土耳其|tr|turkey" }
+  - { name: 土耳其-ULT, <<: *ULT_FILTER, filter: "(?i)土耳其|tr|turkey" }
+
+  # 印度
+  - { name: 印度, <<: *SELECT_FILTER, filter: "(?i)印度|in|india" }
+  - { name: 印度-FB, <<: *FB_FILTER, filter: "(?i)印度|in|india" }
+  - { name: 印度-ULT, <<: *ULT_FILTER, filter: "(?i)印度|in|india" }
+
+  # 全部
+  - { name: 全部节点, <<: *SELECT_FILTER }
+
+  # 代理选择
+  - { name: 代理, type: select, proxies: [台湾, 新加坡, 香港, 美国, 日本, 韩国, 土耳其, 印度, 台湾-FB, 新加坡-FB, 香港-FB, 美国-FB, 日本-FB, 韩国-FB, 土耳其-FB, 印度-FB, 台湾-ULT, 新加坡-ULT, 香港-ULT, 美国-ULT, 日本-ULT, 韩国-ULT, 土耳其-ULT, 印度-ULT, 全部节点]}
+
+  # 直连
+  - { name: 直连, type: select, proxies: [DIRECT, 代理] }
+
+  # 默认
+  - { name: 默认, type: select, proxies: [代理, DIRECT] }
+
+rule-providers:
+  telegram-ipcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    path: ./rules/telegram-ipcidr.yaml
+    interval: 86400
+
+  proxy-domain:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: ./rules/proxy-domain.yaml
+    interval: 86400
+
+  direct-domain:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    path: ./rules/direct-domain.yaml
+    interval: 86400
+
+  direct-ipcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+    path: ./rules/direct-ipcidr.yaml
+    interval: 86400
+
+  private-domain:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
+    path: ./rules/private-domain.yaml
+    interval: 86400
+
+  private-ipcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+    path: ./rules/private-ipcidr.yaml
+    interval: 86400
+
+rules:
+  # 内网域名走直连，路由器走 ipset
+  - RULE-SET,private-domain,直连
+  - RULE-SET,private-ipcidr,直连,no-resolve
+
+  # 国内域名走直连
+  - RULE-SET,direct-domain,直连
+
+  # 国外域名走代理
+  - RULE-SET,proxy-domain,代理
+  - RULE-SET,telegram-ipcidr,代理
+
+  # 国内 IP 走直连，路由器走 ipset
+  - RULE-SET,direct-ipcidr,直连,no-resolve
+
+  # 默认走 代理
+  - MATCH,默认

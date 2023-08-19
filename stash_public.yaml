@@ -1,0 +1,390 @@
+mixed-port: 7788
+redir-port: 1234
+allow-lan: true
+mode: rule
+log-level: info
+
+# web ui 访问地址
+external-controller: '0.0.0.0:1234'
+secret: '10086'
+
+
+sniffer:
+  enable: false
+  sniffing:
+    - tls
+    - http
+  skip-domain:
+    - 'Mijia Cloud'
+    - 'dlg.io.mi.com'
+    - '+.apple.com'
+    - '*.baidu.com'
+  force-domain:
+    - 'google.com'
+    - 'youtube.com'
+    - 'stackoverflow.com'
+  port-whitelist:
+    - 80
+    - 443
+    - 8000-9000
+
+dns:
+  enable: true
+  ipv6: false
+  listen: 0.0.0.0:5334
+  # enhanced-mode: redir-host
+  enhanced-mode: fake-ip
+  fake-ip-filter:
+    - "*.lan"
+    - "daemon.warn"
+    - "*.DHCP"
+    - stun.*.*.*
+    - stun.*.*
+    - time.windows.com
+    - "*.ntp.org.cn"
+    - pool.ntp.org
+    - localhost.ptlogin2.qq.com
+    - "*.dogenode.xyz"
+  default-nameserver:
+    - 119.29.29.29
+    - 114.114.114.114
+  # dns 上游，可以自建 dnsmasq 或者 smartdns
+  nameserver:
+    - https://doh.pub/dns-query
+    - tls://223.5.5.5:853
+  fallback:
+    - 'https://1.0.0.1/dns-query#Proxy' # 使用代理处理 DNS
+    - 'tls://8.8.4.4:853#Proxy'
+  fallback-filter:
+    geoip: false
+    geosite:
+      - gfw
+    ipcidr:
+      - 240.0.0.0/4
+      - 0.0.0.0/32
+      - 127.0.0.1/32
+    domain:
+      - +.google.com
+      - +.facebook.com
+      - +.twitter.com
+      - +.youtube.com
+      - +.xn--ngstr-lra8j.com
+      - +.google.cn
+      - +.googleapis.cn
+      - +.googleapis.com
+      - +.gvt1.com
+
+tun:
+  enable: true
+  stack: system # gvisor / lwip
+  dns-hijack:
+    - 0.0.0.0:53 # 需要劫持的 DNS
+  auto-detect-interface: true # 自动识别出口网卡
+  auto-route: true # 配置路由表
+  # mtu: 9000 # 最大传输单元
+  strict-route: true # 将所有连接路由到tun来防止泄漏，但你的设备将无法其他设备被访问
+  inet4-route-address: # 启用 auto_route 时使用自定义路由而不是默认路由
+    - 0.0.0.0/1
+    - 128.0.0.0/1
+
+
+proxy-providers:
+  provider_cloud:
+    type: http
+    # 机场订阅地址
+    url: 'your provider url'
+    # 一天更新一次
+    interval: 86400
+    health-check:
+      enable: true
+      url: http://cp.cloudflare.com
+      interval: 300
+   
+proxy-groups:
+  # 手动选择
+  - name: AllProxyManul
+    type: select
+    use:
+    - provider_cloud
+
+#======================================================================================================================
+#                                                     url test group
+#======================================================================================================================
+  - name: SG-ULT
+    type: url-test
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'SG|sg|sgp|狮城|新加坡|广新'
+
+  - name: HK-ULT
+    type: url-test
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'HK|hk|香港|广港'
+
+  - name: US-ULT
+    type: url-test
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'US|us|美国|广美'
+
+  - name: JP-ULT
+    type: url-test
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'JP|jp|日本|东京|广日'
+
+  - name: TW-ULT
+    type: url-test
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'TW|tw|台湾|台北|广台'
+
+  - name: KR-ULT
+    type: url-test
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: '韩国|KR|kr|广韩|首尔'
+
+  - name: TR-ULT
+    type: url-test
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: '土耳其|TR|tr'
+
+#======================================================================================================================
+#                                                     fallback group
+#======================================================================================================================
+  - name: SG-FB
+    type: fallback
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'SG|sg|sgp|狮城|新加坡|广新'
+
+  - name: HK-FB
+    type: fallback
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'HK|hk|香港|广港'
+
+  - name: US-FB
+    type: fallback
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'US|us|美国|广美'
+
+  - name: JP-FB
+    type: fallback
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'JP|jp|日本|东京|广日'
+
+  - name: TW-FB
+    type: fallback
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'TW|tw|台湾|台北|广台'
+
+  - name: KR-FB
+    type: fallback
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: '韩国|KR|kr|广韩|首尔|广韩'
+
+  - name: TR-FB
+    type: fallback
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: '土耳其|TR|tr'
+
+
+#======================================================================================================================
+#                                                     select group
+#======================================================================================================================
+  - name: SG-SELECT
+    type: select
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'SG|sg|sgp|狮城|新加坡|广新'
+
+  - name: HK-SELECT
+    type: select
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'HK|hk|香港|广港'
+
+  - name: US-SELECT
+    type: select
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'US|us|美国|广美'
+
+  - name: JP-SELECT
+    type: select
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'JP|jp|日本|东京|广日'
+
+  - name: TW-SELECT
+    type: select
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: 'TW|tw|台湾|台北|广台'
+
+  - name: KR-SELECT
+    type: select
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: '韩国|KR|kr|广韩|首尔|广韩'
+
+  - name: TR-SELECT
+    type: select
+    use:
+      - provider_cloud
+    url: 'http://cp.cloudflare.com'
+    interval: 300
+    filter: '土耳其|TR|tr'
+
+#======================================================================================================================
+  - name: Proxy
+    type: select
+    proxies:
+    - 'TW-FB'
+    - 'SG-FB'
+    - 'HK-FB'
+    - 'US-FB'
+    - 'JP-FB'
+    - 'KR-FB'
+    - 'TR-FB'
+  #  ------------------------------
+    - 'TW-ULT'
+    - 'SG-ULT'
+    - 'HK-ULT'
+    - 'US-ULT'
+    - 'JP-ULT'
+    - 'KR-ULT'
+    - 'TR-ULT'
+  # ------------------------------
+    - 'TW-SELECT'
+    - 'SG-SELECT'
+    - 'HK-SELECT'
+    - 'US-SELECT'
+    - 'JP-SELECT'
+    - 'KR-SELECT'
+    - 'TR-SELECT'
+  # ------------------------------
+    - 'AllProxyManul'
+
+  - name: China
+    type: select
+    proxies:
+    - 'DIRECT'
+    - 'Proxy'
+  
+  - name: Reject
+    type: select
+    proxies:
+    - 'REJECT'
+    - 'DIRECT'
+    - 'Proxy'
+
+rule-providers:
+  telegram-ipcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    path: telegram-ipcidr.yaml
+    interval: 86400
+
+  proxy-domain:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: proxy-domain.yaml
+    interval: 86400
+
+  direct-domain:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    path: direct-domain.yaml
+    interval: 86400
+
+  direct-ipcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+    path: direct-ipcidr.yaml
+    interval: 86400
+
+  private-domain:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
+    path: private-domain.yaml
+    interval: 86400
+
+  private-ipcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+    path: private-ipcidr.yaml
+    interval: 86400
+
+rules:
+ # 内网域名走直连，路由器走 ipset
+ - RULE-SET,private-domain,China
+ - RULE-SET,private-ipcidr,China
+
+ # 国内域名走直连
+ - RULE-SET,direct-domain,China
+
+ # 国外域名走代理
+ - RULE-SET,proxy-domain,Proxy
+ - RULE-SET,telegram-ipcidr,Proxy
+
+ # 国内 IP 走直连，路由器走 ipset
+ - RULE-SET,direct-ipcidr,China,no-resolve
+
+ # 默认走 代理
+ - MATCH,Proxy

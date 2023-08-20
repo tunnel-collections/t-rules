@@ -2,6 +2,7 @@ payload:
   # cloudflare tunnel
   - DOMAIN-SUFFIX,argotunnel.com
   - DOMAIN-SUFFIX,cloudflare.com
+  - DOMAIN-SUFFIX,onetrust.com
   # ======================================= start ============================================
   # chatgpt and other ai 
   - DOMAIN-SUFFIX,ai.com

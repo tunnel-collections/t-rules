@@ -7,11 +7,11 @@ payload:
   - DOMAIN-SUFFIX,openai.com
   - DOMAIN-SUFFIX,auth0.com
   - DOMAIN-SUFFIX,challenges.cloudflare.com
+  - DOMAIN-SUFFIX,bard.google.com
+  - DOMAIN-SUFFIX,claude.ai
   # payment
   - DOMAIN-SUFFIX,stripe.com
   # register
   - DOMAIN-SUFFIX,arkoselabs.com
   - DOMAIN-SUFFIX,openaiapi-site.azureedge.net
-  # bard
-  - DOMAIN-SUFFIX,bard.google.com
   # ========================================= end ==========================================

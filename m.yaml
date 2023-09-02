@@ -128,9 +128,9 @@ proxy-groups:
   - { name: 台湾-ULT, <<: *ULT_FILTER, filter: "(?i)台湾|台北|tw|taiwan" }
 
   # 新加坡
-  - { name: 新加坡, <<: *SELECT_FILTER, filter: "(?i)新加坡|广新|sg|singapore" }
-  - { name: 新加坡-FB, <<: *FB_FILTER, filter: "(?i)新加坡|广新|sg|singapore" }
-  - { name: 新加坡-ULT, <<: *ULT_FILTER, filter: "(?i)新加坡|广新|sg|singapore" }
+  - { name: 新加坡, <<: *SELECT_FILTER, filter: "(?i)新加坡|狮城|广新|sg|singapore" }
+  - { name: 新加坡-FB, <<: *FB_FILTER, filter: "(?i)新加坡|狮城|广新|sg|singapore" }
+  - { name: 新加坡-ULT, <<: *ULT_FILTER, filter: "(?i)新加坡|狮城|广新|sg|singapore" }
 
   # 香港
   - { name: 香港, <<: *SELECT_FILTER, filter: "(?i)港|hk|hongkong|hong kong" }

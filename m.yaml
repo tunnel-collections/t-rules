@@ -29,49 +29,32 @@ sniffer:
 
 dns:
   enable: true
-  ipv6: false
   listen: 0.0.0.0:5334
-  # enhanced-mode: redir-host
+  ipv6: false
   enhanced-mode: fake-ip
+  fake-ip-range: 28.0.0.1/8
   fake-ip-filter:
-    - "*.lan"
-    - "daemon.warn"
-    - "*.DHCP"
-    - stun.*.*.*
-    - stun.*.*
-    - time.windows.com
-    - "*.ntp.org.cn"
-    - pool.ntp.org
-    - localhost.ptlogin2.qq.com
-    - "*.dogenode.xyz"
+    - '*'
+    - '+.lan'
+    - '+.local'
   default-nameserver:
-    - 119.29.29.29
+    - 223.5.5.5
     - 114.114.114.114
-  # dns 上游，可以自建 dnsmasq 或者 smartdns
   nameserver:
+    - 'tls://8.8.4.4#dns'
+    - 'tls://1.0.0.1#dns'
+  proxy-server-nameserver:
+    - 1.2.4.8
     - https://doh.pub/dns-query
-    - tls://223.5.5.5:853
-  fallback:
-    - "https://1.0.0.1/dns-query#代理" # 使用代理处理 DNS
-    - "tls://8.8.4.4:853#代理"
-  fallback-filter:
-    geoip: false
-    geosite:
-      - gfw
-    ipcidr:
-      - 240.0.0.0/4
-      - 0.0.0.0/32
-      - 127.0.0.1/32
-    domain:
-      - +.google.com
-      - +.facebook.com
-      - +.twitter.com
-      - +.youtube.com
-      - +.xn--ngstr-lra8j.com
-      - +.google.cn
-      - +.googleapis.cn
-      - +.googleapis.com
-      - +.gvt1.com
+  nameserver-policy:
+    "rule-set:direct-domain":
+      - https://dns.alidns.com/dns-query
+    "rule-set:proxy-domain":
+      - 'tls://1.0.0.1'
+    "geosite:cn,private":
+      - 1.2.4.8
+      - 114.114.114.114
+      - https://dns.alidns.com/dns-query
 
 tun:
   enable: true

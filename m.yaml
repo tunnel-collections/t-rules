@@ -200,17 +200,37 @@ rule-providers:
     path: ./rules/private-ipcidr.yaml
     interval: 86400
 
+  us-subset:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/tunnel-collections/t-rules/main/us-rule.yaml"
+    path: "./rules/us-subset.yaml"
+    interval: 86400
+
+  cn-subset:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/tunnel-collections/t-rules/main/cn-rules.yaml"
+    path: "./rules/cn-subset.yaml"
+    interval: 86400
+
 rules:
+  # 基于先域名后 IP 的规则
+
   # 内网域名走直连，路由器走 ipset
   - RULE-SET,private-domain,直连
-  - RULE-SET,private-ipcidr,直连,no-resolve
 
   # 国内域名走直连
   - RULE-SET,direct-domain,直连
+  - RULE-SET,cn-subset,直连
 
   # 国外域名走代理
   - RULE-SET,proxy-domain,代理
+  - RULE-SET,us-subset,美国
   - RULE-SET,telegram-ipcidr,代理
+
+  # ip 必须加 no-resolve，防止 dns 泄漏
+  - RULE-SET,private-ipcidr,直连,no-resolve
 
   # 国内 IP 走直连，路由器走 ipset
   - RULE-SET,direct-ipcidr,直连,no-resolve

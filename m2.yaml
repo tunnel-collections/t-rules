@@ -1,0 +1,274 @@
+###########################################################################################################################
+#                                             订阅内容，不要公开
+###########################################################################################################################
+p: &p {type: http, interval: 3600, health-check: {enable: true, url: https://cp.cloudflare.com/generate_204, interval: 300}}
+
+SELECT_FILTER: &SELECT_FILTER
+  type: select
+  use:
+    - provider2
+    - provider3
+
+ULT_FILTER: &ULT_FILTER
+  type: url-test
+  lazy: true
+  url: "https://cp.cloudflare.com/generate_204"
+  interval: 300
+  use:
+    - provider2
+    - provider3
+
+FB_FILTER: &FB_FILTER
+  type: fallback
+  url: "https://cp.cloudflare.com/generate_204"
+  interval: 300
+  use:
+    - provider2
+    - provider3
+
+proxy-providers:
+  provider1:
+    # 机场订阅地址
+    url: https://11111
+    <<: *p
+
+  provider2:
+    # 机场订阅地址
+    url: 'https://222222'
+    <<: *p
+
+  provider3:
+    url: 'https://333333'
+    <<: *p
+###########################################################################################################################
+
+
+mixed-port: 7788
+redir-port: 1234
+allow-lan: true
+mode: rule
+log-level: info
+
+# web ui 访问地址
+external-controller: '0.0.0.0:1111'
+external-ui: clash-dashboard
+secret: '1008611'
+ipv6: false
+
+# use geo if true else mmdb
+geodata-mode: true
+geox-url:
+  #geoip: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
+  geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/geoip-only-cn-private.dat"
+  geosite: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
+  mmdb: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+
+find-process-mode: off
+global-client-fingerprint: chrome
+
+profile:
+  store-selected: true
+#  store-fake-ip: true
+
+sniffer:
+  enable: false
+  # force-dns-mapping: false
+  # parse-pure-ip: false           # 对所有未获取到域名的流量进行强制嗅探
+  override-destination: true
+  sniff:
+    TLS:
+      ports: [443, 8443]
+    HTTP:
+      ports: [80, 8000-9000]
+      override-destination: true
+  force-domain:
+    - +.v2ex.com
+    - 'google.com'
+    - 'youtube.com'
+    - 'ytimg.com'
+    - 'docker.io'
+    - 'stackoverflow.com'
+    - '+.apple.com'
+  # 白名单,跳过嗅探结果
+  skip-domain:
+    - Mijia Cloud
+    - 'dlg.io.mi.com'
+    - '*.baidu.com'
+
+tun:
+  enable: true
+  stack: system
+  auto-route: true
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+
+dns:
+  enable: true
+  listen: :5334
+  ipv6: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 28.0.0.1/8
+  fake-ip-filter:
+    - '*'
+    - '+.lan'
+    - '+.local'
+    - 'ntp1.aliyun.com'
+    - 'time1.cloud.tencent.com'
+    - '*.infinitynewtab.com'
+    - '*.cn'
+  default-nameserver:
+    - 223.5.5.5
+    - 114.114.114.114
+  nameserver:
+    - 'tls://8.8.8.8#P-Proxy'
+    # - 'tls://1.1.1.1#P-Proxy'
+    - 'https://dns.cloudflare.com/dns-query#h3=true'
+  proxy-server-nameserver:
+    - https://dns.alidns.com/dns-query#h3=true
+    - 192.168.82.1:1253
+  nameserver-policy:
+    "rule-set:direct-domain,own-cn-domain":
+      - 192.168.82.1:1253
+      - https://dns.alidns.com/dns-query#h3=true
+
+proxy-groups:
+  # 台湾
+  - { name: P-TW, <<: *SELECT_FILTER, filter: "(?i)台湾|台北|tw|taiwan" }
+  - { name: P-TW-FB, <<: *FB_FILTER, filter: "(?i)台湾|台北|tw|taiwan" }
+  - { name: P-TW-ULT, <<: *ULT_FILTER, filter: "(?i)台湾|台北|tw|taiwan" }
+
+  # 新加坡
+  - { name: P-SGP, <<: *SELECT_FILTER, filter: "(?i)新加坡|狮城|广新|sg|singapore" }
+  - { name: P-SGP-FB, <<: *FB_FILTER, filter: "(?i)新加坡|狮城|广新|sg|singapore" }
+  - { name: P-SGP-ULT, <<: *ULT_FILTER, filter: "(?i)新加坡|狮城|广新|sg|singapore" }
+
+  # 香港
+  - { name: P-HK, <<: *SELECT_FILTER, filter: "(?i)港|hk|hongkong|hong kong" }
+  - { name: P-HK-FB, <<: *FB_FILTER, filter: "(?i)港|hk|hongkong|hong kong" }
+  - { name: P-HK-ULT, <<: *ULT_FILTER, filter: "(?i)港|hk|hongkong|hong kong" }
+
+  # 美国
+  - { name: P-US, <<: *SELECT_FILTER, filter: "(?i)美国|广美|us|usa|united states" }
+  - { name: P-US-FB, <<: *FB_FILTER, filter: "(?i)美国|广美|us|usa|united states" }
+  - { name: P-US-ULT, <<: *ULT_FILTER, filter: "(?i)美国|广美|us|usa|united states" }
+
+  # 日本
+  - { name: P-JP, <<: *SELECT_FILTER, filter: "(?i)日本|广日|jp|japan" }
+  - { name: P-JP-FB, <<: *FB_FILTER, filter: "(?i)日本|广日|jp|japan" }
+  - { name: P-JP-ULT, <<: *ULT_FILTER, filter: "(?i)日本|广日|jp|japan" }
+
+  # 韩国
+  - { name: P-KR, <<: *SELECT_FILTER, filter: "(?i)韩国|广韩|kr|korea" }
+  - { name: P-KR-FB, <<: *FB_FILTER, filter: "(?i)韩国|广韩|kr|korea" }
+  - { name: P-KR-ULT, <<: *ULT_FILTER, filter: "(?i)韩国|广韩|kr|korea" }
+
+  # 土耳其
+  # - { name: 土耳其, <<: *SELECT_FILTER, filter: "(?i)土耳其|tr|turkey" }
+  # - { name: 土耳其-FB, <<: *FB_FILTER, filter: "(?i)土耳其|tr|turkey" }
+  # - { name: 土耳其-ULT, <<: *ULT_FILTER, filter: "(?i)土耳其|tr|turkey" }
+
+  # 印度
+  # - { name: 印度, <<: *SELECT_FILTER, filter: "(?i)印度|in|india" }
+  # - { name: 印度-FB, <<: *FB_FILTER, filter: "(?i)印度|in|india" }
+  # - { name: 印度-ULT, <<: *ULT_FILTER, filter: "(?i)印度|in|india" }
+
+  # 全部
+  - { name: All-Proxy-Nodes, <<: *SELECT_FILTER }
+
+  # 代理选择
+  - { name: P-Proxy, type: select, proxies: [P-TW, P-SGP, P-HK, P-US, P-JP, P-KR, P-TW-FB, P-SGP-FB, P-HK-FB, P-US-FB, P-JP-FB, P-KR-FB,  P-TW-ULT, P-SGP-ULT, P-HK-ULT, P-US-ULT, P-JP-ULT, P-KR-ULT,  All-Proxy-Nodes]}
+
+  # 直连
+  - { name: P-Direct, type: select, proxies: [DIRECT, P-Proxy] }
+
+  # 默认
+  - { name: P-Default, type: select, proxies: [P-Proxy, DIRECT] }
+
+rule-providers:
+  telegram-ipcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    path: ./rules/telegram-ipcidr.yaml
+    interval: 86400
+
+  proxy-domain:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: ./rules/proxy-domain.yaml
+    interval: 86400
+
+  direct-domain:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    path: ./rules/direct-domain.yaml
+    interval: 86400
+
+  direct-ipcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+    path: ./rules/direct-ipcidr.yaml
+    interval: 86400
+
+  private-domain:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
+    path: ./rules/private-domain.yaml
+    interval: 86400
+
+  private-ipcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+    path: ./rules/private-ipcidr.yaml
+    interval: 86400
+
+  applications:
+    type: http
+    behavior: classical
+    url: "https://raw.githubusercontent.com/tunnel-collections/t-rules/main/app-direct.yaml"
+    path: ./rules/applications.yaml
+    interval: 86400
+
+  own-cn-domain:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/tunnel-collections/t-rules/main/own-cn-domain.list"
+    path: ./rules/own-cn-domain.list
+    interval: 86400
+
+  own-us-domain:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/tunnel-collections/t-rules/main/own-us-domain.list"
+    path: ./rules/own-us-domain.list
+    interval: 86400
+
+rules:
+  # 基于先域名后 IP 的规则
+
+  # 内网域名走直连，路由器走 ipset
+  - RULE-SET,private-domain,P-Direct
+
+  # 国内域名走直连
+  - RULE-SET,direct-domain,P-Direct
+  - RULE-SET,own-cn-domain,P-Direct
+
+  # 国外域名走代理
+  - RULE-SET,proxy-domain,P-Proxy
+  - RULE-SET,own-us-domain,P-US
+  - RULE-SET,telegram-ipcidr,P-Proxy
+
+  # ip 必须加 no-resolve，防止 dns 泄漏
+  - RULE-SET,private-ipcidr,P-Direct,no-resolve
+
+  # 国内 IP 走直连，路由器走 ipset
+  - RULE-SET,direct-ipcidr,P-Direct,no-resolve
+
+  # 默认走 代理
+  - MATCH,P-Default

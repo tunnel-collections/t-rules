@@ -255,14 +255,15 @@ rules:
   # 内网域名走直连，路由器走 ipset
   - RULE-SET,private-domain,P-Direct
 
+  - RULE-SET,own-us-domain,P-US
+  - RULE-SET,own-cn-domain,P-Direct
+  
   # 国内域名走直连
   - RULE-SET,direct-domain,P-Direct
-  - RULE-SET,own-cn-domain,P-Direct
 
   # 国外域名走代理
   - RULE-SET,proxy-domain,P-Proxy
-  - RULE-SET,own-us-domain,P-US
-  - RULE-SET,telegram-ipcidr,P-Proxy
+  - RULE-SET,telegram-ipcidr,P-Telegram
 
   # ip 必须加 no-resolve，防止 dns 泄漏
   - RULE-SET,private-ipcidr,P-Direct,no-resolve

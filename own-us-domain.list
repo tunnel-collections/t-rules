@@ -8,6 +8,7 @@ payload:
   - '+.challenges.cloudflare.com'
   - '+.bard.google.com'
   - '+.claude.ai'
+  - '+.poe.com'
   - '+.anthropic.com'
   - '+.intercom.io'
   - '+.stripe.com'

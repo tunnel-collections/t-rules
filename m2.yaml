@@ -52,7 +52,7 @@ log-level: info
 # web ui 访问地址
 external-controller: '0.0.0.0:1111'
 external-ui: clash-dashboard
-secret: '1008611'
+secret: '11223344'
 ipv6: false
 
 # use geo if true else mmdb
@@ -68,7 +68,7 @@ global-client-fingerprint: chrome
 
 profile:
   store-selected: true
-#  store-fake-ip: true
+  store-fake-ip: true
 
 sniffer:
   enable: false
@@ -95,14 +95,6 @@ sniffer:
     - 'dlg.io.mi.com'
     - '*.baidu.com'
 
-tun:
-  enable: true
-  stack: system
-  auto-route: true
-  auto-detect-interface: true
-  dns-hijack:
-    - any:53
-
 dns:
   enable: true
   listen: :5334
@@ -116,21 +108,29 @@ dns:
     - 'ntp1.aliyun.com'
     - 'time1.cloud.tencent.com'
     - '*.infinitynewtab.com'
-    - '*.cn'
+    - '*.com.cn'
   default-nameserver:
     - 223.5.5.5
     - 114.114.114.114
   nameserver:
     - 'tls://8.8.8.8#P-Proxy'
-    # - 'tls://1.1.1.1#P-Proxy'
-    - 'https://dns.cloudflare.com/dns-query#h3=true'
+    - 'https://dns.cloudflare.com/dns-query#P-Proxy&h3=true'
+  fallback:
+    - 'tls://8.8.8.8#P-Proxy'
+    - 'https://dns.cloudflare.com/dns-query#P-Proxy&h3=true'
+  fallback-filter:
+    ipcidr:
+      - 240.0.0.0/4
+    domain:
+      - '+.google.com'
+      - '+.facebook.com'
+      - '+.youtube.com'
   proxy-server-nameserver:
     - https://dns.alidns.com/dns-query#h3=true
     - 192.168.82.1:1253
   nameserver-policy:
     "rule-set:direct-domain,own-cn-domain":
       - 192.168.82.1:1253
-      - https://dns.alidns.com/dns-query#h3=true
 
 proxy-groups:
   # 台湾
@@ -178,6 +178,7 @@ proxy-groups:
 
   # 代理选择
   - { name: P-Proxy, type: select, proxies: [P-TW, P-SGP, P-HK, P-US, P-JP, P-KR, P-TW-FB, P-SGP-FB, P-HK-FB, P-US-FB, P-JP-FB, P-KR-FB,  P-TW-ULT, P-SGP-ULT, P-HK-ULT, P-US-ULT, P-JP-ULT, P-KR-ULT,  All-Proxy-Nodes]}
+  - { name: P-Telegram, type: select, proxies: [P-TW, P-SGP, P-HK, P-US, P-JP, P-KR, P-TW-FB, P-SGP-FB, P-HK-FB, P-US-FB, P-JP-FB, P-KR-FB,  P-TW-ULT, P-SGP-ULT, P-HK-ULT, P-US-ULT, P-JP-ULT, P-KR-ULT,  All-Proxy-Nodes]}
 
   # 直连
   - { name: P-Direct, type: select, proxies: [DIRECT, P-Proxy] }
@@ -253,23 +254,24 @@ rules:
   # 基于先域名后 IP 的规则
 
   # 内网域名走直连，路由器走 ipset
-  - RULE-SET,private-domain,P-Direct
+  - RULE-SET,private-domain,DIRECT
 
   - RULE-SET,own-us-domain,P-US
-  - RULE-SET,own-cn-domain,P-Direct
+  - RULE-SET,own-cn-domain,DIRECT
   
   # 国内域名走直连
-  - RULE-SET,direct-domain,P-Direct
+  - RULE-SET,direct-domain,DIRECT
+  - DOMAIN-KEYWORD,com.cn,DIRECT
 
   # 国外域名走代理
   - RULE-SET,proxy-domain,P-Proxy
   - RULE-SET,telegram-ipcidr,P-Telegram
 
   # ip 必须加 no-resolve，防止 dns 泄漏
-  - RULE-SET,private-ipcidr,P-Direct,no-resolve
+  - RULE-SET,private-ipcidr,DIRECT,no-resolve
 
   # 国内 IP 走直连，路由器走 ipset
-  - RULE-SET,direct-ipcidr,P-Direct,no-resolve
+  - RULE-SET,direct-ipcidr,DIRECT,no-resolve
 
   # 默认走 代理
   - MATCH,P-Default

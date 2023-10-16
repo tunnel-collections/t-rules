@@ -9,6 +9,7 @@ payload:
   - '+.bard.google.com'
   - '+.claude.ai'
   - '+.poe.com'
+  - '+.monica.im'
   - '+.anthropic.com'
   - '+.intercom.io'
   - '+.stripe.com'

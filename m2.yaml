@@ -56,12 +56,13 @@ secret: '11223344'
 ipv6: false
 
 # use geo if true else mmdb
-geodata-mode: true
+geodata-mode: false
 geox-url:
   #geoip: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
   geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/geoip-only-cn-private.dat"
   geosite: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
-  mmdb: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+  #mmdb: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
+  mmdb: "https://raw.githubusercontent.com/tunnel-collections/t-rules/main/JohnnySun.geoip.Country-only-cn-private.mmdb"
 
 find-process-mode: off
 global-client-fingerprint: chrome

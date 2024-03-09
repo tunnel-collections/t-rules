@@ -1,0 +1,66 @@
+
+
+
+#!name= Loon gpt plugin
+#!author = Loon0x00
+#!homepage = https://github.com/Loon0x00
+
+[Rule]
+DOMAIN,browser-intake-datadoghq.com,PROXY
+DOMAIN,static.cloudflareinsights.com,PROXY
+DOMAIN-SUFFIX,ai.com,PROXY
+DOMAIN-SUFFIX,algolia.net,PROXY
+DOMAIN-SUFFIX,api.statsig.com,PROXY
+DOMAIN-SUFFIX,auth0.com,PROXY
+DOMAIN-SUFFIX,cdn.cloudflare.net,PROXY
+DOMAIN-SUFFIX,challenges.cloudflare.com,PROXY
+DOMAIN-SUFFIX,chatgpt.livekit.cloud,PROXY
+DOMAIN-SUFFIX,client-api.arkoselabs.com,PROXY
+DOMAIN-SUFFIX,events.statsigapi.net,PROXY
+DOMAIN-SUFFIX,featuregates.org,PROXY
+DOMAIN-SUFFIX,host.livekit.cloud,PROXY
+DOMAIN-SUFFIX,identrust.com,PROXY
+DOMAIN-SUFFIX,intercom.io,PROXY
+DOMAIN-SUFFIX,intercomcdn.com,PROXY
+DOMAIN-SUFFIX,launchdarkly.com,PROXY
+DOMAIN-SUFFIX,oaistatic.com,PROXY
+DOMAIN-SUFFIX,oaiusercontent.com,PROXY
+DOMAIN-SUFFIX,observeit.net,PROXY
+DOMAIN-SUFFIX,poe.com,PROXY
+DOMAIN-SUFFIX,segment.io,PROXY
+DOMAIN-SUFFIX,sentry.io,PROXY
+DOMAIN-SUFFIX,stripe.com,PROXY
+DOMAIN-SUFFIX,turn.livekit.cloud,PROXY
+DOMAIN-SUFFIX,theb.ai,PROXY
+DOMAIN-KEYWORD,openai,PROXY
+IP-CIDR,24.199.123.28/32,PROXY,no-resolve
+IP-CIDR,64.23.132.171/32,PROXY,no-resolve
+IP-ASN,20473,PROXY,no-resolve
+
+[Host]
+*browser-intake-datadoghq.com = server:1.1.1.1
+*static.cloudflareinsights.com = server:1.1.1.1
+*.ai.com = server:1.1.1.1
+*.algolia.net = server:1.1.1.1
+*.api.statsig.com = server:1.1.1.1
+*.auth0.com = server:1.1.1.1
+*.cdn.cloudflare.net = server:1.1.1.1
+*.challenges.cloudflare.com = server:1.1.1.1
+*.chatgpt.livekit.cloud = server:1.1.1.1
+*.client-api.arkoselabs.com = server:1.1.1.1
+*.events.statsigapi.net = server:1.1.1.1
+*.featuregates.org = server:1.1.1.1
+*.host.livekit.cloud = server:1.1.1.1
+*.identrust.com = server:1.1.1.1
+*.intercom.io = server:1.1.1.1
+*.intercomcdn.com = server:1.1.1.1
+*.launchdarkly.com = server:1.1.1.1
+*.oaistatic.com = server:1.1.1.1
+*.oaiusercontent.com = server:1.1.1.1
+*.observeit.net = server:1.1.1.1
+*.poe.com = server:1.1.1.1
+*.segment.io = server:1.1.1.1
+*.sentry.io = server:1.1.1.1
+*.stripe.com = server:1.1.1.1
+*.turn.livekit.cloud = server:1.1.1.1
+*theb.ai = server:1.1.1.1

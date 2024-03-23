@@ -15,3 +15,5 @@ payload:
   - '+.stripe.com'
   - '+.arkoselabs.com'
   - '+.openaiapi-site.azureedge.net'
+  - '+.theb.ai'
+  - '+.baizhi.ai'

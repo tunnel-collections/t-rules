@@ -17,3 +17,4 @@ payload:
   - '+.openaiapi-site.azureedge.net'
   - '+.theb.ai'
   - '+.baizhi.ai'
+  - 'generativelanguage.googleapis.com'

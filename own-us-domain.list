@@ -18,3 +18,5 @@ payload:
   - '+.theb.ai'
   - '+.baizhi.ai'
   - 'generativelanguage.googleapis.com'
+  - 'gemini.google.com'
+  - '+.gstatic.com'

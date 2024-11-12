@@ -21,3 +21,4 @@ payload:
   - 'gemini.google.com'
   - '+.gstatic.com'
   - '+.googleapis.com'
+  - '+.siliconflow.cn'

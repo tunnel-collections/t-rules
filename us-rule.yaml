@@ -13,6 +13,7 @@ payload:
   - DOMAIN-SUFFIX,claude.ai
   - DOMAIN-SUFFIX,anthropic.com
   - DOMAIN-SUFFIX,intercom.io
+  - DOMAIN-SUFFIX,antigravity-unleash.goog
   # payment
   - DOMAIN-SUFFIX,stripe.com
   # register

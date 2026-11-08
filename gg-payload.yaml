@@ -1,4 +1,5 @@
 payload:
+  - '.itunes-apple.com.akadns.net'
 # Google 域名规则集 — mihomo rule-provider (behavior: domain)
 # 格式: '.example.com' = 后缀匹配 / 'books.example.com' = 精确匹配
 # 来源: v2fly/domain-list-community @44e3721 + supplement.txt，共 1145 条
